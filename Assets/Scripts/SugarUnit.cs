@@ -8,6 +8,9 @@ public class SugarUnit : MonoBehaviour
     private GameObject model;
 
     [SerializeField]
+    private GameObject ghostModel;
+
+    [SerializeField]
     private MeshRenderer meshRenderer;
 
     [SerializeField]
@@ -25,6 +28,11 @@ public class SugarUnit : MonoBehaviour
     {
         await MoveTo(entity);
         LandedAsync().Forget();
+    }
+
+    public void SetVisibleGhost(bool isVisible)
+    {
+        ghostModel.SetActive(isVisible);
     }
 
     private void SetMaterial(SugarEntity entity)
