@@ -100,3 +100,4 @@ InitTestScene*.unity*
 
 # other
 *.vscode
+*.DS_Store
