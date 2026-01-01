@@ -47,24 +47,32 @@ public class SugersController : MonoBehaviour
 
         if(Keyboard.current.leftArrowKey.wasPressedThisFrame)
         {
-            var targetX = currentSugarUnit.Entity.positionIdx.Value.x - 1;
-            currentSugarUnit.MoveToSide(
-                -1,
-                new Vector2Int(targetX, GetLandablePositionIdx(targetX))
-            );
-            ingameState = IngameState.ChangeStateSugar;
-            _cts.Cancel();
+            //TODO 移動先のy座標を見て移動可能か判断する
+            if(true)
+            {
+                var targetX = currentSugarUnit.Entity.positionIdx.Value.x - 1;
+                currentSugarUnit.MoveToSide(
+                    -1,
+                    new Vector2Int(targetX, GetLandablePositionIdx(targetX))
+                );
+                ingameState = IngameState.ChangeStateSugar;
+                _cts.Cancel();
+            }
         }
 
         if(Keyboard.current.rightArrowKey.wasPressedThisFrame)
         {
-            var targetX = currentSugarUnit.Entity.positionIdx.Value.x + 1;
-            currentSugarUnit.MoveToSide(
-                1,
-                new Vector2Int(targetX, GetLandablePositionIdx(targetX))
-            );
-            ingameState = IngameState.ChangeStateSugar;
-            _cts.Cancel();
+            //TODO 移動先のy座標を見て移動可能か判断する
+            if(true)
+            {
+                var targetX = currentSugarUnit.Entity.positionIdx.Value.x + 1;
+                currentSugarUnit.MoveToSide(
+                    1,
+                    new Vector2Int(targetX, GetLandablePositionIdx(targetX))
+                );
+                ingameState = IngameState.ChangeStateSugar;
+                _cts.Cancel();
+            }
         }
 
         //TODO 管理箇所を変更
