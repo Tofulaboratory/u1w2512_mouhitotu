@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SugarUnit
   model: {fileID: 5436879809444243747}
+  ghostModel: {fileID: 441082052956973216}
   meshRenderer: {fileID: 7818181162724547859}
   materials:
   - {fileID: 2100000, guid: 745cd113acddc4c4eab218bb7a73be10, type: 2}
@@ -118,6 +119,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05688168750091b4eb003a70bf0f6879, type: 3}
+--- !u!1 &441082052956973216 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 05688168750091b4eb003a70bf0f6879, type: 3}
+  m_PrefabInstance: {fileID: 783169057229755889}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &960631656169648666 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 05688168750091b4eb003a70bf0f6879, type: 3}

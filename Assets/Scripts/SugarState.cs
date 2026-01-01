@@ -1,7 +1,8 @@
 public enum SugarState
 {
-    White = 1,
+    White = 0,
     Red,
     Blue,
-    Green
+    Green,
+    LEBGTH,
 }

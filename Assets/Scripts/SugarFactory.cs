@@ -2,8 +2,11 @@ using UnityEngine;
 
 public class SugarFactory
 {
-    public SugarEntity CreateSuger()
+    public SugarEntity CreateSuger(Vector2Int positionIdx)
     {
-        return new SugarEntity();
+        var entity = new SugarEntity();
+        entity.state.Value = (SugarState)Random.Range(0,(int)SugarState.LEBGTH);
+        entity.positionIdx.Value = positionIdx;
+        return entity;
     }
 }
