@@ -4,13 +4,25 @@ using UnityEngine;
 public class SugarEntity
 {
     public ReactiveProperty<SugarState> state;
-    public ReactiveProperty<bool> isMoving;
+    public ReactiveProperty<bool> IsMoving;
+    public bool IsFreeze;
+    public ReactiveProperty<bool> IsWaitCombo;
+    public bool IsDead;
     public ReactiveProperty<Vector2Int> positionIdx;
+    public ReactiveProperty<float> WaitComboGaugeNum;
+    public int ChainId = -1;
 
     public SugarEntity()
     {
         state = new ReactiveProperty<SugarState>();
-        isMoving = new ReactiveProperty<bool>(true);
-        this.positionIdx = new ReactiveProperty<Vector2Int>();
+        IsMoving = new ReactiveProperty<bool>(true);
+        IsWaitCombo = new ReactiveProperty<bool>(false);
+        positionIdx = new ReactiveProperty<Vector2Int>();
+        WaitComboGaugeNum = new ReactiveProperty<float>(5);
+    }
+
+    public bool IsNeighbor(Vector2Int positionIdx)
+    {
+        return Vector2Int.Distance(this.positionIdx.Value, positionIdx) <= 1;
     }
 }

@@ -3,6 +3,8 @@ using DG.Tweening;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using System;
+using UniRx;
+using UnityEngine.UI;
 
 public class SugarUnit : MonoBehaviour
 {
@@ -13,6 +15,9 @@ public class SugarUnit : MonoBehaviour
     private GameObject ghostModel;
 
     [SerializeField]
+    private Image gaugeUI;
+
+    [SerializeField]
     private MeshRenderer meshRenderer;
 
     [SerializeField]
@@ -20,6 +25,8 @@ public class SugarUnit : MonoBehaviour
 
     private SugarEntity entity;
     public SugarEntity Entity => entity;
+
+    private float gaugeDuration = 5f;
 
     public async UniTask InitializeAsync(SugarEntity entity, CancellationToken ct = new CancellationToken())
     {
@@ -29,6 +36,35 @@ public class SugarUnit : MonoBehaviour
         SetMaterial();
         await MoveToBeginPosition(ct);
         model.SetActive(true);
+
+        Entity.IsWaitCombo.Subscribe(value =>
+        {
+            if(value)
+            {
+                gaugeUI.gameObject.SetActive(true);
+                MoveGaugeAsync().Forget();
+            }
+        }).AddTo(this);
+
+        Entity.WaitComboGaugeNum.Subscribe(value =>
+        {
+            gaugeUI.fillAmount = value / gaugeDuration;
+        }).AddTo(this);
+    }
+
+    private async UniTask MoveGaugeAsync()
+    {
+        while(true)
+        {
+            Entity.WaitComboGaugeNum.Value -= Time.deltaTime;
+            if(Entity.WaitComboGaugeNum.Value <= 0)
+            {
+                this.entity.IsDead = true;
+                return;
+            }
+
+            await UniTask.Yield();
+        }
     }
 
     public async UniTask FallAsync(Action onComplete, CancellationToken ct = new CancellationToken())
@@ -53,7 +89,7 @@ public class SugarUnit : MonoBehaviour
 
     public void DecidedPosition()
     {
-        entity.isMoving.Value = false;
+        entity.IsMoving.Value = false;
     }
 
     public void SetVisibleGhost(bool isVisible)

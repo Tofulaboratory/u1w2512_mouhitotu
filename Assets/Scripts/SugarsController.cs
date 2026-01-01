@@ -16,13 +16,69 @@ public class SugersController : MonoBehaviour
 
     private SugarFactory sugarFactory;
 
-    private ReactiveCollection<SugarEntity> sugarEntities;
+    private ReactiveCollection<SugarUnit> sugarUnits;
+
+    private int newestChainId = 0;
+
     private int GetLandablePositionIdx(int xIdx)
     {
-        var yIdx = sugarEntities
-            ?.Where(item => item.positionIdx?.Value.x == xIdx)
-            ?.Max(item => item.positionIdx?.Value.y);
+        var yIdx = sugarUnits
+            ?.Where(item => item.Entity.positionIdx?.Value.x == xIdx)
+            ?.Max(item => item.Entity.positionIdx?.Value.y);
         return (yIdx ?? -1) + 1;
+    }
+
+    private void FireChainSugar(SugarUnit unit)
+    {
+        for(int i = sugarUnits.Count() - 1; i >= 0; i--)
+        {
+            var item = sugarUnits[i];
+            if(item.Entity.IsFreeze &&
+                item.Entity.ChainId != unit.Entity.ChainId &&
+                item.Entity.IsNeighbor(unit.Entity.positionIdx.Value) &&
+                item.Entity.state.Value == unit.Entity.state.Value)
+            {
+                item.Entity.IsWaitCombo.Value = true;
+                item.Entity.WaitComboGaugeNum.Value = 5;
+                item.Entity.ChainId = unit.Entity.ChainId;
+                FireChainSugar(item);
+            }
+        }
+    }
+
+    private void CheckAndFireSugar(SugarUnit unit)
+    {
+        for(int i = sugarUnits.Count() - 1; i >= 0; i--)
+        {
+            var item = sugarUnits[i];
+            if(item.Entity.IsFreeze &&
+                item.Entity.IsNeighbor(unit.Entity.positionIdx.Value) &&
+                item.Entity.state.Value == unit.Entity.state.Value)
+            {
+                item.Entity.IsWaitCombo.Value = true;
+                item.Entity.WaitComboGaugeNum.Value = 5;
+                item.Entity.ChainId = newestChainId;
+                unit.Entity.IsWaitCombo.Value = true;
+                unit.Entity.WaitComboGaugeNum.Value = 5;
+                unit.Entity.ChainId = newestChainId;
+                newestChainId++;
+
+                FireChainSugar(item);
+            }
+        }
+    }
+
+    private void CleanUpSugar()
+    {
+        for(int i = sugarUnits.Count() - 1; i >= 0; i--)
+        {
+            var item = sugarUnits[i];
+            if(item.Entity.IsDead)
+            {
+                sugarUnits.Remove(item);
+                Destroy(item.gameObject);
+            }
+        }
     }
 
     private CancellationTokenSource _cts;
@@ -33,7 +89,7 @@ public class SugersController : MonoBehaviour
     {
         _cts = new CancellationTokenSource();
         sugarFactory = new SugarFactory();
-        sugarEntities = new ReactiveCollection<SugarEntity>();
+        sugarUnits = new ReactiveCollection<SugarUnit>();
     }
 
     void Update()
@@ -86,7 +142,7 @@ public class SugersController : MonoBehaviour
                 var xIdx = UnityEngine.Random.Range(0,24);
                 CreateSugerUnitAsync(new Vector2Int(xIdx, GetLandablePositionIdx(xIdx))).Forget();
                 MoveSugarUnitAsync(()=>{
-                    ingameState = IngameState.CreateSugar;
+                    FreezeSugar();
                 }).Forget();
                 ingameState = IngameState.FallSugar;
             break;
@@ -96,16 +152,16 @@ public class SugersController : MonoBehaviour
 
             case IngameState.ChangeStateSugar:
                 ingameState = IngameState.FallSugar;
-                if(currentSugarUnit.Entity.isMoving.Value)
+                if(currentSugarUnit.Entity.IsMoving.Value)
                 {
                     MoveSugarUnitAsync(()=>{
-                        ingameState = IngameState.CreateSugar;
+                        FreezeSugar();
                     }).Forget();
                 }
                 else
                 {
                     currentSugarUnit.FallFastAsync(()=>{
-                        ingameState = IngameState.CreateSugar;
+                        FreezeSugar();
                     }).Forget();
                 }
             break;
@@ -118,10 +174,19 @@ public class SugersController : MonoBehaviour
     public async UniTask CreateSugerUnitAsync(Vector2Int positionIdx)
     {
         var entity = sugarFactory.CreateSuger(positionIdx);
-        sugarEntities.Add(entity);
+        var unit = Instantiate(sugerUnitPrefab, transform.position, Quaternion.identity);
+        sugarUnits.Add(unit);
 
-        currentSugarUnit = Instantiate(sugerUnitPrefab, transform.position, Quaternion.identity);
+        currentSugarUnit = unit;
         await currentSugarUnit.InitializeAsync(entity);
+    }
+
+    private void FreezeSugar()
+    {
+        CheckAndFireSugar(currentSugarUnit);
+        currentSugarUnit.Entity.IsFreeze = true;
+        ingameState = IngameState.CreateSugar;
+        CleanUpSugar();
     }
 
     private async UniTask MoveSugarUnitAsync(Action onComplete)

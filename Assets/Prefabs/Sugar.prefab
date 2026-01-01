@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &997499831913791188
 RectTransform:
   m_ObjectHideFlags: 0
@@ -93,7 +93,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &926993351903961737
 RectTransform:
   m_ObjectHideFlags: 0
@@ -226,6 +226,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SugarUnit
   model: {fileID: 5436879809444243747}
   ghostModel: {fileID: 441082052956973216}
+  gaugeUI: {fileID: 3176493007934156231}
   meshRenderer: {fileID: 7818181162724547859}
   materials:
   - {fileID: 2100000, guid: 745cd113acddc4c4eab218bb7a73be10, type: 2}
