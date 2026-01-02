@@ -39,7 +39,7 @@ public class SugersController : MonoBehaviour
                 item.Entity.state.Value == unit.Entity.state.Value)
             {
                 item.Entity.IsWaitCombo.Value = true;
-                item.Entity.WaitComboGaugeNum.Value = 5;
+                item.Entity.WaitComboGaugeNum.Value = Const.SUGAR_GAUGE_DURATION;
                 item.Entity.ChainId = unit.Entity.ChainId;
                 FireChainSugar(item);
             }

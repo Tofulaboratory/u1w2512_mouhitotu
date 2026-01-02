@@ -26,8 +26,6 @@ public class SugarUnit : MonoBehaviour
     private SugarEntity entity;
     public SugarEntity Entity => entity;
 
-    private float gaugeDuration = 5f;
-
     public async UniTask InitializeAsync(SugarEntity entity, CancellationToken ct = new CancellationToken())
     {
         this.entity = entity;
@@ -48,7 +46,7 @@ public class SugarUnit : MonoBehaviour
 
         Entity.WaitComboGaugeNum.Subscribe(value =>
         {
-            gaugeUI.fillAmount = value / gaugeDuration;
+            gaugeUI.fillAmount = value / Const.SUGAR_GAUGE_DURATION;
         }).AddTo(this);
     }
 

@@ -18,7 +18,7 @@ public class SugarEntity
         IsMoving = new ReactiveProperty<bool>(true);
         IsWaitCombo = new ReactiveProperty<bool>(false);
         positionIdx = new ReactiveProperty<Vector2Int>();
-        WaitComboGaugeNum = new ReactiveProperty<float>(5);
+        WaitComboGaugeNum = new ReactiveProperty<float>(Const.SUGAR_GAUGE_DURATION);
     }
 
     public bool IsNeighbor(Vector2Int positionIdx)
