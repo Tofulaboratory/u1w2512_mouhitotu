@@ -26,13 +26,34 @@ public class SugarUnit : MonoBehaviour
     private SugarEntity entity;
     public SugarEntity Entity => entity;
 
-    public async UniTask InitializeAsync(SugarEntity entity, CancellationToken ct = new CancellationToken())
+    private float remainFallTime = -1;
+    private async UniTask CountRemainFallTimeAsync(float initFallTime, CancellationToken ct)
+    {
+        if(remainFallTime == -1 || remainFallTime > initFallTime)
+        {
+            remainFallTime = initFallTime;
+        }
+
+        while(!ct.IsCancellationRequested)
+        {
+            remainFallTime -= Time.deltaTime;
+            if(remainFallTime <= 0)
+            {
+                remainFallTime = -1;
+                return;
+            }
+
+            await UniTask.Yield();
+        }
+    }
+
+    public void Initialize(SugarEntity entity, CancellationToken ct = new CancellationToken())
     {
         this.entity = entity;
 
         model.SetActive(false);
         SetMaterial();
-        await MoveToBeginPosition(ct);
+        MoveToBeginPosition(ct);
         model.SetActive(true);
 
         Entity.IsWaitCombo.Subscribe(value =>
@@ -67,7 +88,8 @@ public class SugarUnit : MonoBehaviour
 
     public async UniTask FallAsync(Action onComplete, CancellationToken ct = new CancellationToken())
     {
-        await MoveToTargetPositionY(1f,ct);
+        CountRemainFallTimeAsync(Const.FALL_DURATION, ct).Forget();
+        await MoveToTargetPositionY(remainFallTime,ct);
         LandedAsync(ct).Forget();
         if(!ct.IsCancellationRequested)
         {
@@ -77,7 +99,8 @@ public class SugarUnit : MonoBehaviour
 
     public async UniTask FallFastAsync(Action onComplete, CancellationToken ct = new CancellationToken())
     {
-        await MoveToTargetPosition(0.1f, ct);
+        CountRemainFallTimeAsync(Const.FALL_FAST_DURATION, ct).Forget();
+        await MoveToTargetPosition(remainFallTime, ct);
         LandedAsync(ct).Forget();
         if(!ct.IsCancellationRequested)
         {
@@ -124,8 +147,8 @@ public class SugarUnit : MonoBehaviour
         await transform.DOMove(SugarPositionSolver.GetSugarTargetPosition(entity),interval).ToUniTask(cancellationToken:ct);
     }
 
-    private async UniTask MoveToBeginPosition(CancellationToken ct = new CancellationToken())
+    private void MoveToBeginPosition(CancellationToken ct = new CancellationToken())
     {
-        await transform.DOMove(SugarPositionSolver.GetSugarBeginPosition(entity), 0f).ToUniTask(cancellationToken:ct);
+        transform.DOMove(SugarPositionSolver.GetSugarBeginPosition(entity), 0f).ToUniTask(cancellationToken:ct).Forget();
     }
 }

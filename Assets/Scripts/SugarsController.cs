@@ -106,9 +106,15 @@ public class SugersController : MonoBehaviour
             //TODO 移動先のy座標を見て移動可能か判断する
             if(true)
             {
-                var targetX = currentSugarUnit.Entity.positionIdx.Value.x - 1;
+                var diff = -1;
+                int targetX = currentSugarUnit.Entity.positionIdx.Value.x + diff;
+                if(targetX < 0)
+                {
+                    diff += Const.FIELD_X_RANGE;
+                    targetX += Const.FIELD_X_RANGE;
+                }
                 currentSugarUnit.MoveToSide(
-                    -1,
+                    diff,
                     new Vector2Int(targetX, GetLandablePositionIdx(targetX))
                 );
                 ingameState = IngameState.ChangeStateSugar;
@@ -121,9 +127,15 @@ public class SugersController : MonoBehaviour
             //TODO 移動先のy座標を見て移動可能か判断する
             if(true)
             {
-                var targetX = currentSugarUnit.Entity.positionIdx.Value.x + 1;
+                var diff = 1;
+                int targetX = currentSugarUnit.Entity.positionIdx.Value.x + diff;
+                if(targetX >= Const.FIELD_X_RANGE)
+                {
+                    diff -= Const.FIELD_X_RANGE;
+                    targetX -= Const.FIELD_X_RANGE;
+                }
                 currentSugarUnit.MoveToSide(
-                    1,
+                    diff,
                     new Vector2Int(targetX, GetLandablePositionIdx(targetX))
                 );
                 ingameState = IngameState.ChangeStateSugar;
@@ -139,8 +151,8 @@ public class SugersController : MonoBehaviour
             break;
 
             case IngameState.CreateSugar:
-                var xIdx = UnityEngine.Random.Range(0,24);
-                CreateSugerUnitAsync(new Vector2Int(xIdx, GetLandablePositionIdx(xIdx))).Forget();
+                var xIdx = UnityEngine.Random.Range(0, Const.FIELD_X_RANGE);
+                CreateSugerUnit(new Vector2Int(xIdx, GetLandablePositionIdx(xIdx)));
                 MoveSugarUnitAsync(()=>{
                     FreezeSugar();
                 }).Forget();
@@ -171,14 +183,14 @@ public class SugersController : MonoBehaviour
         }
     }
 
-    public async UniTask CreateSugerUnitAsync(Vector2Int positionIdx)
+    private void CreateSugerUnit(Vector2Int positionIdx)
     {
         var entity = sugarFactory.CreateSuger(positionIdx);
         var unit = Instantiate(sugerUnitPrefab, transform.position, Quaternion.identity);
         sugarUnits.Add(unit);
 
         currentSugarUnit = unit;
-        await currentSugarUnit.InitializeAsync(entity);
+        currentSugarUnit.Initialize(entity);
     }
 
     private void FreezeSugar()
