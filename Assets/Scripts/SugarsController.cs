@@ -56,10 +56,10 @@ public class SugersController : MonoBehaviour
                 item.Entity.state.Value == unit.Entity.state.Value)
             {
                 item.Entity.IsWaitCombo.Value = true;
-                item.Entity.WaitComboGaugeNum.Value = 5;
+                item.Entity.WaitComboGaugeNum.Value = Const.SUGAR_GAUGE_DURATION;
                 item.Entity.ChainId = newestChainId;
                 unit.Entity.IsWaitCombo.Value = true;
-                unit.Entity.WaitComboGaugeNum.Value = 5;
+                unit.Entity.WaitComboGaugeNum.Value = Const.SUGAR_GAUGE_DURATION;
                 unit.Entity.ChainId = newestChainId;
                 newestChainId++;
 
@@ -68,46 +68,28 @@ public class SugersController : MonoBehaviour
         }
     }
 
-    // TODO バグあり
-    // private void BreakDownSugars()
-    // {
-    //     foreach(var unit in sugarUnits.OrderBy(item => item.Entity.positionIdx.Value.y))
-    //     {
-    //         var target = sugarUnits
-    //             .Where(item => item.Entity.positionIdx.Value.x == unit.Entity.positionIdx.Value.x)
-    //             .Where(item => item.Entity.positionIdx.Value.y < unit.Entity.positionIdx.Value.y);
-    //         foreach(var i in target)
-    //         {
-    //             Debug.LogError(i.Entity.positionIdx.Value.y);
-    //         }
-    //         if(target.Count() > 0)
-    //         {
-    //             var targetYIdx = target.Max(item => item.Entity.positionIdx.Value.y);
-    //             if(unit.Entity.positionIdx.Value.y != targetYIdx + 1)
-    //             {
-    //                 //Debug.LogError($"{unit.Entity.positionIdx.Value.y}->{targetYIdx}");
-    //                 unit.Entity.positionIdx.Value = new Vector2Int(
-    //                     unit.Entity.positionIdx.Value.x,
-    //                     targetYIdx + 1
-    //                 );
-    //                 unit.FallAsync(()=>{}).Forget();
-    //             }
-    //         }
-    //     }
-    // }
+    private void BreakDownSugars()
+    {
+        foreach(var unit in sugarUnits.OrderBy(item => item.Entity.positionIdx.Value.y))
+        {
+            var target = sugarUnits
+                .Where(item => item.Entity.positionIdx.Value.x == unit.Entity.positionIdx.Value.x)
+                .Where(item => item.Entity.positionIdx.Value.y < unit.Entity.positionIdx.Value.y);
 
-    // private void CleanUpSugar()
-    // {
-    //     for(int i = sugarUnits.Count() - 1; i >= 0; i--)
-    //     {
-    //         var item = sugarUnits[i];
-    //         if(item.Entity.IsDead.Value)
-    //         {
-    //             sugarUnits.Remove(item);
-    //             Destroy(item.gameObject);
-    //         }
-    //     }
-    // }
+            if(target.Count() > 0)
+            {
+                var targetYIdx = target.Max(item => item.Entity.positionIdx.Value.y);
+                if(unit.Entity.positionIdx.Value.y > targetYIdx + 1)
+                {
+                    unit.Entity.positionIdx.Value = new Vector2Int(
+                        unit.Entity.positionIdx.Value.x,
+                        targetYIdx + 1
+                    );
+                    unit.FallFastAsync(()=>{}).Forget();
+                }
+            }
+        }
+    }
 
     private CancellationTokenSource _cts;
     private SugarUnit currentSugarUnit;
@@ -240,6 +222,7 @@ public class SugersController : MonoBehaviour
                 {
                     sugarUnits.Remove(unit);
                     Destroy(unit.gameObject);
+                    BreakDownSugars();
                 }).Forget();
             }
         }).AddTo(unit);
