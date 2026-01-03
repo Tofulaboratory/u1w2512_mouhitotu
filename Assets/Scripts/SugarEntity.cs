@@ -11,14 +11,16 @@ public class SugarEntity
     public ReactiveProperty<Vector2Int> positionIdx;
     public ReactiveProperty<float> WaitComboGaugeNum;
     public int ChainId = -1;
+    public bool IsPreInit { get; private set; }
 
-    public SugarEntity()
+    public SugarEntity(bool isPreInit)
     {
         state = new ReactiveProperty<SugarState>();
         IsMoving = new ReactiveProperty<bool>(true);
         IsWaitCombo = new ReactiveProperty<bool>(false);
         positionIdx = new ReactiveProperty<Vector2Int>();
         WaitComboGaugeNum = new ReactiveProperty<float>(Const.SUGAR_GAUGE_DURATION);
+        IsPreInit = isPreInit;
     }
 
     public bool IsNeighbor(Vector2Int positionIdx)

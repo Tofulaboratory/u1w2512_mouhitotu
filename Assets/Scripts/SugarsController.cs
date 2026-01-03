@@ -68,6 +68,34 @@ public class SugersController : MonoBehaviour
         }
     }
 
+    // TODO バグあり
+    // private void BreakDownSugars()
+    // {
+    //     foreach(var unit in sugarUnits.OrderBy(item => item.Entity.positionIdx.Value.y))
+    //     {
+    //         var target = sugarUnits
+    //             .Where(item => item.Entity.positionIdx.Value.x == unit.Entity.positionIdx.Value.x)
+    //             .Where(item => item.Entity.positionIdx.Value.y < unit.Entity.positionIdx.Value.y);
+    //         foreach(var i in target)
+    //         {
+    //             Debug.LogError(i.Entity.positionIdx.Value.y);
+    //         }
+    //         if(target.Count() > 0)
+    //         {
+    //             var targetYIdx = target.Max(item => item.Entity.positionIdx.Value.y);
+    //             if(unit.Entity.positionIdx.Value.y != targetYIdx + 1)
+    //             {
+    //                 //Debug.LogError($"{unit.Entity.positionIdx.Value.y}->{targetYIdx}");
+    //                 unit.Entity.positionIdx.Value = new Vector2Int(
+    //                     unit.Entity.positionIdx.Value.x,
+    //                     targetYIdx + 1
+    //                 );
+    //                 unit.FallAsync(()=>{}).Forget();
+    //             }
+    //         }
+    //     }
+    // }
+
     private void CleanUpSugar()
     {
         for(int i = sugarUnits.Count() - 1; i >= 0; i--)
@@ -148,11 +176,12 @@ public class SugersController : MonoBehaviour
         {
             case IngameState.Begin:
                 ingameState = IngameState.CreateSugar;
+                BuildFieldSugarUnit();
             break;
 
             case IngameState.CreateSugar:
                 var xIdx = UnityEngine.Random.Range(0, Const.FIELD_X_RANGE);
-                CreateSugerUnit(new Vector2Int(xIdx, GetLandablePositionIdx(xIdx)));
+                CreateSugarUnit(new Vector2Int(xIdx, GetLandablePositionIdx(xIdx)),false);
                 MoveSugarUnitAsync(()=>{
                     FreezeSugar();
                 }).Forget();
@@ -183,14 +212,36 @@ public class SugersController : MonoBehaviour
         }
     }
 
-    private void CreateSugerUnit(Vector2Int positionIdx)
+    private void CreateSugarUnit(Vector2Int positionIdx, bool isPreInit)
     {
-        var entity = sugarFactory.CreateSuger(positionIdx);
+        var entity = sugarFactory.CreateSuger(positionIdx, isPreInit);
         var unit = Instantiate(sugerUnitPrefab, transform.position, Quaternion.identity);
         sugarUnits.Add(unit);
 
-        currentSugarUnit = unit;
-        currentSugarUnit.Initialize(entity);
+        if(isPreInit)
+        {
+            unit.Initialize(entity);
+            unit.FallImmedatelyAsync(() =>
+            {
+                entity.IsFreeze = true;
+            });
+        }
+        else
+        {
+            currentSugarUnit = unit;
+            currentSugarUnit.Initialize(entity);
+        }
+    }
+
+    private void BuildFieldSugarUnit()
+    {
+        for(int i = 0; i < Const.FIELD_X_RANGE; i++)
+        {
+            for(int j = 0; j < Const.FIELD_Y_RANGE - 1; j++)
+            {
+                CreateSugarUnit(new Vector2Int(i, j), true);
+            }
+        }
     }
 
     private void FreezeSugar()

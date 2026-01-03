@@ -108,6 +108,13 @@ public class SugarUnit : MonoBehaviour
         }
     }
 
+    public void FallImmedatelyAsync(Action onComplete)
+    {
+        MoveToTargetPosition(0).Forget();
+        LandedAsync().Forget();
+        onComplete?.Invoke();
+    }
+
     public void DecidedPosition()
     {
         entity.IsMoving.Value = false;
