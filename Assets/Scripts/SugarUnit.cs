@@ -26,6 +26,8 @@ public class SugarUnit : MonoBehaviour
     private SugarEntity entity;
     public SugarEntity Entity => entity;
 
+    private CancellationTokenSource _cts = new CancellationTokenSource();
+
     private float remainFallTime = -1;
     private async UniTask CountRemainFallTimeAsync(float initFallTime, CancellationToken ct)
     {
@@ -90,9 +92,9 @@ public class SugarUnit : MonoBehaviour
     {
         CountRemainFallTimeAsync(Const.FALL_DURATION, ct).Forget();
         await MoveToTargetPositionY(remainFallTime,ct);
-        LandedAsync(ct).Forget();
         if(!ct.IsCancellationRequested)
         {
+            LandedAsync(ct).Forget();
             onComplete?.Invoke();
         }
     }
@@ -101,9 +103,9 @@ public class SugarUnit : MonoBehaviour
     {
         CountRemainFallTimeAsync(Const.FALL_FAST_DURATION, ct).Forget();
         await MoveToTargetPosition(remainFallTime, ct);
-        LandedAsync(ct).Forget();
         if(!ct.IsCancellationRequested)
         {
+            LandedAsync(ct).Forget();
             onComplete?.Invoke();
         }
     }
@@ -137,11 +139,17 @@ public class SugarUnit : MonoBehaviour
         meshRenderer.material = materials[index];
     }
 
-    private async UniTask LandedAsync(CancellationToken ct = new CancellationToken())
+    private async UniTask LandedAsync(CancellationToken? ct = null)
     {
+        var _ct = ct == null ? new CancellationToken() : _cts.Token;
+        if(_ct.IsCancellationRequested)
+        {
+            return;
+        }
+
         var prevScale = transform.localScale;
-        await transform.DOScale(prevScale * 1.2f, 0.05f).ToUniTask(cancellationToken:ct);
-        await transform.DOScale(prevScale, 0.05f).ToUniTask(cancellationToken:ct);
+        await transform.DOScale(prevScale * 1.2f, 0.05f).ToUniTask(cancellationToken:_ct);
+        await transform.DOScale(prevScale, 0.05f).ToUniTask(cancellationToken:_ct);
     }
 
     public async UniTask ExplodeAsync(Action onComplete, CancellationToken ct = new CancellationToken())
@@ -188,5 +196,10 @@ public class SugarUnit : MonoBehaviour
     private void MoveToBeginPosition(CancellationToken ct = new CancellationToken())
     {
         transform.DOMove(SugarPositionSolver.GetSugarBeginPosition(entity), 0f).ToUniTask(cancellationToken:ct).Forget();
+    }
+
+    void OnDestroy()
+    {
+        _cts.Cancel();
     }
 }
