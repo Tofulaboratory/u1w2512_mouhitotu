@@ -78,7 +78,7 @@ public class SugarUnit : MonoBehaviour
             Entity.WaitComboGaugeNum.Value -= Time.deltaTime;
             if(Entity.WaitComboGaugeNum.Value <= 0)
             {
-                this.entity.IsDead = true;
+                this.entity.IsDead.Value = true;
                 return;
             }
 
@@ -142,6 +142,37 @@ public class SugarUnit : MonoBehaviour
         var prevScale = transform.localScale;
         await transform.DOScale(prevScale * 1.2f, 0.05f).ToUniTask(cancellationToken:ct);
         await transform.DOScale(prevScale, 0.05f).ToUniTask(cancellationToken:ct);
+    }
+
+    public async UniTask ExplodeAsync(Action onComplete, CancellationToken ct = new CancellationToken())
+    {
+        var duration = 0.1f;
+        var prevScale = transform.localScale;
+        DoThinMaterial(duration, ct).Forget();
+        await transform.DOScale(prevScale * 3f, duration).ToUniTask(cancellationToken:ct);
+        onComplete?.Invoke();
+    }
+
+    private async UniTask DoThinMaterial(float duration, CancellationToken ct = new CancellationToken())
+    {
+        float _time = 1;
+        while(!ct.IsCancellationRequested)
+        {
+            _time -= Time.deltaTime / duration;
+
+            meshRenderer.material.color = new Color(
+                meshRenderer.material.color.r,
+                meshRenderer.material.color.g,
+                meshRenderer.material.color.b,
+                _time
+            );
+
+            if(_time <= 0)
+            {
+                return;
+            }
+            await UniTask.Yield();
+        }
     }
 
     private async UniTask MoveToTargetPositionY(float interval, CancellationToken ct = new CancellationToken())

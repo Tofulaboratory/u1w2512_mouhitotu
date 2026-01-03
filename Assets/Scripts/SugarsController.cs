@@ -96,18 +96,18 @@ public class SugersController : MonoBehaviour
     //     }
     // }
 
-    private void CleanUpSugar()
-    {
-        for(int i = sugarUnits.Count() - 1; i >= 0; i--)
-        {
-            var item = sugarUnits[i];
-            if(item.Entity.IsDead)
-            {
-                sugarUnits.Remove(item);
-                Destroy(item.gameObject);
-            }
-        }
-    }
+    // private void CleanUpSugar()
+    // {
+    //     for(int i = sugarUnits.Count() - 1; i >= 0; i--)
+    //     {
+    //         var item = sugarUnits[i];
+    //         if(item.Entity.IsDead.Value)
+    //         {
+    //             sugarUnits.Remove(item);
+    //             Destroy(item.gameObject);
+    //         }
+    //     }
+    // }
 
     private CancellationTokenSource _cts;
     private SugarUnit currentSugarUnit;
@@ -231,6 +231,18 @@ public class SugersController : MonoBehaviour
             currentSugarUnit = unit;
             currentSugarUnit.Initialize(entity);
         }
+
+        entity.IsDead.Subscribe(value =>
+        {
+            if(value)
+            {
+                unit.ExplodeAsync(() =>
+                {
+                    sugarUnits.Remove(unit);
+                    Destroy(unit.gameObject);
+                }).Forget();
+            }
+        }).AddTo(unit);
     }
 
     private void BuildFieldSugarUnit()
@@ -249,7 +261,6 @@ public class SugersController : MonoBehaviour
         CheckAndFireSugar(currentSugarUnit);
         currentSugarUnit.Entity.IsFreeze = true;
         ingameState = IngameState.CreateSugar;
-        CleanUpSugar();
     }
 
     private async UniTask MoveSugarUnitAsync(Action onComplete)
