@@ -58,9 +58,11 @@ public class SugersController : MonoBehaviour
                 item.Entity.IsWaitCombo.Value = true;
                 item.Entity.WaitComboGaugeNum.Value = Const.SUGAR_GAUGE_DURATION;
                 item.Entity.ChainId = newestChainId;
+
                 unit.Entity.IsWaitCombo.Value = true;
                 unit.Entity.WaitComboGaugeNum.Value = Const.SUGAR_GAUGE_DURATION;
                 unit.Entity.ChainId = newestChainId;
+
                 newestChainId++;
 
                 FireChainSugar(item);
@@ -85,7 +87,10 @@ public class SugersController : MonoBehaviour
                         unit.Entity.positionIdx.Value.x,
                         targetYIdx + 1
                     );
-                    unit.FallFastAsync(()=>{}).Forget();
+                    unit.FallFastAsync(() =>
+                    {
+                        CheckAndFireSugar(unit);
+                    }).Forget();
                 }
             }
         }
