@@ -135,8 +135,15 @@ public class SugarUnit : MonoBehaviour
 
     private void SetMaterial()
     {
-        var index = (int)entity.state.Value;
-        meshRenderer.material = materials[index];
+        if(entity.state.Value == SugarState.Rainbow)
+        {
+            DoRainbowMaterial().Forget();
+        }
+        else
+        {
+            var index = (int)entity.state.Value;
+            meshRenderer.material = materials[index];
+        }
     }
 
     private async UniTask LandedAsync(CancellationToken? ct = null)
@@ -159,6 +166,17 @@ public class SugarUnit : MonoBehaviour
         DoThinMaterial(duration, ct).Forget();
         await transform.DOScale(prevScale * 3f, duration).ToUniTask(cancellationToken:ct);
         onComplete?.Invoke();
+    }
+
+    private async UniTask DoRainbowMaterial()
+    {
+        float _time = 0;
+        while(!_cts.IsCancellationRequested)
+        {
+            _time += 0.1f;
+            meshRenderer.material.color = Color.HSVToRGB(_time % 1, 1, 1);
+            await UniTask.WaitForSeconds(0.1f);
+        }
     }
 
     private async UniTask DoThinMaterial(float duration, CancellationToken ct = new CancellationToken())

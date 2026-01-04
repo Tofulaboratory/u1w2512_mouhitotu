@@ -5,4 +5,5 @@ public enum SugarState
     Blue,
     Green,
     LEBGTH,
+    Rainbow, // 特殊ステート
 }

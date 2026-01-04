@@ -53,7 +53,7 @@ public class SugersController : MonoBehaviour
             var item = sugarUnits[i];
             if(item.Entity.IsFreeze &&
                 item.Entity.IsNeighbor(unit.Entity.positionIdx.Value) &&
-                item.Entity.state.Value == unit.Entity.state.Value)
+                (item.Entity.state.Value == unit.Entity.state.Value || unit.Entity.state.Value == SugarState.Rainbow))
             {
                 item.Entity.IsWaitCombo.Value = true;
                 item.Entity.WaitComboGaugeNum.Value = Const.SUGAR_GAUGE_DURATION;
