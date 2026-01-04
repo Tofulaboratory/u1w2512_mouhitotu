@@ -2,15 +2,10 @@ using UnityEngine;
 
 public class View : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    private GameObject nigiyaka1;
 
-    // Update is called once per frame
-    void Update()
+    public void SetActiveNigiyaka1()
     {
-        
     }
 }
