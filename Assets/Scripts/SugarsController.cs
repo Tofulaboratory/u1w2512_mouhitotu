@@ -18,6 +18,9 @@ public class SugersController : MonoBehaviour
 
     private ReactiveCollection<SugarUnit> sugarUnits;
 
+    [SerializeField]
+    private View view;
+
     private int newestChainId = 0;
 
     private int GetLandablePositionIdx(int xIdx)
@@ -30,10 +33,10 @@ public class SugersController : MonoBehaviour
 
     private void FireChainSugar(SugarUnit unit)
     {
-        for(int i = sugarUnits.Count() - 1; i >= 0; i--)
+        for (int i = sugarUnits.Count() - 1; i >= 0; i--)
         {
             var item = sugarUnits[i];
-            if(item.Entity.IsFreeze &&
+            if (item.Entity.IsFreeze &&
                 item.Entity.ChainId != unit.Entity.ChainId &&
                 item.Entity.IsNeighbor(unit.Entity.positionIdx.Value) &&
                 item.Entity.state.Value == unit.Entity.state.Value)
@@ -48,10 +51,10 @@ public class SugersController : MonoBehaviour
 
     private void CheckAndFireSugar(SugarUnit unit)
     {
-        for(int i = sugarUnits.Count() - 1; i >= 0; i--)
+        for (int i = sugarUnits.Count() - 1; i >= 0; i--)
         {
             var item = sugarUnits[i];
-            if(item.Entity.IsFreeze &&
+            if (item.Entity.IsFreeze &&
                 item.Entity.IsNeighbor(unit.Entity.positionIdx.Value) &&
                 (item.Entity.state.Value == unit.Entity.state.Value || unit.Entity.state.Value == SugarState.Rainbow))
             {
@@ -72,16 +75,16 @@ public class SugersController : MonoBehaviour
 
     private void BreakDownSugars()
     {
-        foreach(var unit in sugarUnits.OrderBy(item => item.Entity.positionIdx.Value.y))
+        foreach (var unit in sugarUnits.OrderBy(item => item.Entity.positionIdx.Value.y))
         {
             var target = sugarUnits
                 .Where(item => item.Entity.positionIdx.Value.x == unit.Entity.positionIdx.Value.x)
                 .Where(item => item.Entity.positionIdx.Value.y < unit.Entity.positionIdx.Value.y);
 
-            if(target.Count() > 0)
+            if (target.Count() > 0)
             {
                 var targetYIdx = target.Max(item => item.Entity.positionIdx.Value.y);
-                if(unit.Entity.positionIdx.Value.y > targetYIdx + 1)
+                if (unit.Entity.positionIdx.Value.y > targetYIdx + 1)
                 {
                     unit.Entity.positionIdx.Value = new Vector2Int(
                         unit.Entity.positionIdx.Value.x,
@@ -98,32 +101,34 @@ public class SugersController : MonoBehaviour
 
     private CancellationTokenSource _cts;
     private SugarUnit currentSugarUnit;
-    private IngameState ingameState;
+    private ReactiveProperty<IngameState> ingameState;
 
     void Start()
     {
         _cts = new CancellationTokenSource();
         sugarFactory = new SugarFactory();
         sugarUnits = new ReactiveCollection<SugarUnit>();
+        ingameState = new ReactiveProperty<IngameState>();
+        ingameState.Subscribe(state => UpdateState(state)).AddTo(this);
     }
 
     void Update()
     {
-        if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             currentSugarUnit.DecidedPosition();
-            ingameState = IngameState.ChangeStateSugar;
+            ingameState.Value = IngameState.ChangeStateSugar;
             _cts.Cancel();
         }
 
-        if(Keyboard.current.leftArrowKey.wasPressedThisFrame)
+        if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
         {
             //TODO 移動先のy座標を見て移動可能か判断する
-            if(true)
+            if (true)
             {
                 var diff = -1;
                 int targetX = currentSugarUnit.Entity.positionIdx.Value.x + diff;
-                if(targetX < 0)
+                if (targetX < 0)
                 {
                     diff += Const.FIELD_X_RANGE;
                     targetX += Const.FIELD_X_RANGE;
@@ -132,19 +137,19 @@ public class SugersController : MonoBehaviour
                     diff,
                     new Vector2Int(targetX, GetLandablePositionIdx(targetX))
                 );
-                ingameState = IngameState.ChangeStateSugar;
+                ingameState.Value = IngameState.ChangeStateSugar;
                 _cts.Cancel();
             }
         }
 
-        if(Keyboard.current.rightArrowKey.wasPressedThisFrame)
+        if (Keyboard.current.rightArrowKey.wasPressedThisFrame)
         {
             //TODO 移動先のy座標を見て移動可能か判断する
-            if(true)
+            if (true)
             {
                 var diff = 1;
                 int targetX = currentSugarUnit.Entity.positionIdx.Value.x + diff;
-                if(targetX >= Const.FIELD_X_RANGE)
+                if (targetX >= Const.FIELD_X_RANGE)
                 {
                     diff -= Const.FIELD_X_RANGE;
                     targetX -= Const.FIELD_X_RANGE;
@@ -153,49 +158,60 @@ public class SugersController : MonoBehaviour
                     diff,
                     new Vector2Int(targetX, GetLandablePositionIdx(targetX))
                 );
-                ingameState = IngameState.ChangeStateSugar;
+                ingameState.Value = IngameState.ChangeStateSugar;
                 _cts.Cancel();
             }
         }
+    }
 
-        //TODO 管理箇所を変更
-        switch(ingameState)
+    private void UpdateState(IngameState state)
+    {
+        view.UpdateState(state);
+        switch (state)
         {
+            case IngameState.Title:
+                break;
             case IngameState.Begin:
-                ingameState = IngameState.CreateSugar;
+                ingameState.Value = IngameState.CreateSugar;
                 BuildFieldSugarUnit();
-            break;
+                break;
 
             case IngameState.CreateSugar:
                 var xIdx = UnityEngine.Random.Range(0, Const.FIELD_X_RANGE);
-                CreateSugarUnit(new Vector2Int(xIdx, GetLandablePositionIdx(xIdx)),false);
-                MoveSugarUnitAsync(()=>{
+                CreateSugarUnit(new Vector2Int(xIdx, GetLandablePositionIdx(xIdx)), false);
+                MoveSugarUnitAsync(() =>
+                {
                     FreezeSugar();
                 }).Forget();
-                ingameState = IngameState.FallSugar;
-            break;
+                ingameState.Value = IngameState.FallSugar;
+                break;
 
             case IngameState.FallSugar:
-            break;
+                break;
 
             case IngameState.ChangeStateSugar:
-                ingameState = IngameState.FallSugar;
-                if(currentSugarUnit.Entity.IsMoving.Value)
+                ingameState.Value = IngameState.FallSugar;
+                if (currentSugarUnit.Entity.IsMoving.Value)
                 {
-                    MoveSugarUnitAsync(()=>{
+                    MoveSugarUnitAsync(() =>
+                    {
                         FreezeSugar();
                     }).Forget();
                 }
                 else
                 {
-                    currentSugarUnit.FallFastAsync(()=>{
+                    currentSugarUnit.FallFastAsync(() =>
+                    {
                         FreezeSugar();
                     }).Forget();
                 }
-            break;
+                break;
 
             case IngameState.End:
-            break;
+                break;
+
+            case IngameState.Result:
+                break;
         }
     }
 
@@ -205,7 +221,7 @@ public class SugersController : MonoBehaviour
         var unit = Instantiate(sugerUnitPrefab, transform.position, Quaternion.identity);
         sugarUnits.Add(unit);
 
-        if(isPreInit)
+        if (isPreInit)
         {
             unit.Initialize(entity);
             unit.FallImmedatelyAsync(() =>
@@ -221,7 +237,7 @@ public class SugersController : MonoBehaviour
 
         entity.IsDead.Subscribe(value =>
         {
-            if(value)
+            if (value)
             {
                 unit.ExplodeAsync(() =>
                 {
@@ -235,9 +251,9 @@ public class SugersController : MonoBehaviour
 
     private void BuildFieldSugarUnit()
     {
-        for(int i = 0; i < Const.FIELD_X_RANGE; i++)
+        for (int i = 0; i < Const.FIELD_X_RANGE; i++)
         {
-            for(int j = 0; j < Const.FIELD_Y_RANGE - 1; j++)
+            for (int j = 0; j < Const.FIELD_Y_RANGE - 1; j++)
             {
                 CreateSugarUnit(new Vector2Int(i, j), true);
             }
@@ -248,7 +264,7 @@ public class SugersController : MonoBehaviour
     {
         CheckAndFireSugar(currentSugarUnit);
         currentSugarUnit.Entity.IsFreeze = true;
-        ingameState = IngameState.CreateSugar;
+        ingameState.Value = IngameState.CreateSugar;
     }
 
     private async UniTask MoveSugarUnitAsync(Action onComplete)
