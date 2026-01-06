@@ -26,7 +26,7 @@ public class View : MonoBehaviour
         {
             case IngameState.Title:
             nigiyaka1.SetActive(true);
-            //title.SetActive(true);
+            title.SetActive(true);
             timer.SetActive(false);
             levelIndicator.SetActive(false);
             pressSpace.SetActive(true);
@@ -35,7 +35,7 @@ public class View : MonoBehaviour
 
             case IngameState.Begin:
             nigiyaka1.SetActive(false);
-            //title.SetActive(false);
+            title.SetActive(false);
             timer.SetActive(true);
             levelIndicator.SetActive(true);
             pressSpace.SetActive(false);
