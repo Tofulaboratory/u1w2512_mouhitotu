@@ -116,9 +116,22 @@ public class SugersController : MonoBehaviour
     {
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            currentSugarUnit.DecidedPosition();
-            ingameState.Value = IngameState.ChangeStateSugar;
-            _cts.Cancel();
+            switch (ingameState.Value)
+            {
+                case IngameState.Title:
+                    ingameState.Value = IngameState.Begin;
+                    break;
+
+                case IngameState.FallSugar:
+                    currentSugarUnit.DecidedPosition();
+                    ingameState.Value = IngameState.ChangeStateSugar;
+                    _cts.Cancel();
+                    break;
+
+                case IngameState.Result:
+                    //TODO リザルト
+                    break;
+            }
         }
 
         if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
