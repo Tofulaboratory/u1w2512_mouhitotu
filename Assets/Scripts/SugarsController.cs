@@ -179,14 +179,15 @@ public class SugersController : MonoBehaviour
 
     private void UpdateState(IngameState state)
     {
+        Debug.Log(state);
         view.UpdateState(state);
         switch (state)
         {
             case IngameState.Title:
                 break;
             case IngameState.Begin:
-                ingameState.Value = IngameState.CreateSugar;
                 BuildFieldSugarUnit();
+                ingameState.Value = IngameState.CreateSugar;
                 break;
 
             case IngameState.CreateSugar:
