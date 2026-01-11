@@ -1,5 +1,7 @@
-using Unity.VisualScripting;
+using Cysharp.Threading.Tasks;
+using TMPro;
 using UnityEngine;
+using UniRx;
 
 public class View : MonoBehaviour
 {
@@ -16,7 +18,13 @@ public class View : MonoBehaviour
     private GameObject timer;
 
     [SerializeField]
+    private TextMeshProUGUI timerText;
+
+    [SerializeField]
     private GameObject levelIndicator;
+
+    [SerializeField]
+    private TextMeshProUGUI levelIndicatorText;
 
     [SerializeField]
     private GameObject pressSpace;
@@ -25,7 +33,36 @@ public class View : MonoBehaviour
     private GameObject result;
 
     [SerializeField]
+    private TextMeshProUGUI resultScoreText;
+
+    [SerializeField]
+    private TextMeshProUGUI resultLevelText;
+
+    [SerializeField]
     private GameObject levelCenter;
+
+    [SerializeField]
+    private TextMeshProUGUI levelCenterText;
+
+    [SerializeField]
+    private GameObject levelUpAvailableText;
+
+    public void InitializeForScoreManager()
+    {
+        ScoreManager.Instance.GameTime.Subscribe(time => timerText.text = $"{time}").AddTo(this).AddTo(this);
+    }
+
+    public void SetLevelText()
+    {
+        levelIndicatorText.text = $"LEVEL {ScoreManager.Instance.Level}";
+        levelCenterText.text = $"LEVEL {ScoreManager.Instance.Level}";
+        resultLevelText.text = $"LEVEL {ScoreManager.Instance.Level}";
+    }
+
+    public void SetActivelevelUpAvailableText(bool isActive)
+    {
+        levelUpAvailableText.SetActive(isActive);
+    }
 
     public void UpdateState(IngameState state)
     {
@@ -40,6 +77,7 @@ public class View : MonoBehaviour
             pressSpace.SetActive(true);
             result.SetActive(false);
             levelCenter.SetActive(false);
+            levelUpAvailableText.SetActive(false);
             break;
 
             case IngameState.PrepareBegin:
@@ -52,10 +90,11 @@ public class View : MonoBehaviour
             nigiyaka2.SetActive(true);
             nigiyaka2.GetComponent<Animator>().SetTrigger("NigiyakaMove1");
             levelCenter.SetActive(true);
+            SetLevelText();
             break;
 
             case IngameState.Begin:
-            nigiyaka2.SetActive(false);            
+            nigiyaka2.SetActive(false);          
             levelCenter.SetActive(false);
             break;
 
@@ -75,6 +114,7 @@ public class View : MonoBehaviour
             nigiyaka2.SetActive(true);
             nigiyaka2.GetComponent<Animator>().SetTrigger("NigiyakaMove1");
             levelCenter.SetActive(true);
+            SetLevelText();
             break;
 
             case IngameState.ToNextLevel:

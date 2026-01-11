@@ -9,4 +9,5 @@ public static class Const
     public const float FALL_DURATION = 10f;
     public const float FALL_FAST_DURATION = 0.05f;
     public const int NEXT_LEVEL_THRESHOLD = 5;
+    public const int TIME_DURATION_LEVEL = 30;
 }
