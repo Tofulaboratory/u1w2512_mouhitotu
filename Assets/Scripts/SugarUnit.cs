@@ -77,14 +77,14 @@ public class SugarUnit : MonoBehaviour
     {
         while(true)
         {
-            Entity.WaitComboGaugeNum.Value -= Time.deltaTime;
+            Entity.WaitComboGaugeNum.Value -= 0.1f;
             if(Entity.WaitComboGaugeNum.Value <= 0)
             {
                 this.entity.IsDead.Value = true;
                 return;
             }
 
-            await UniTask.Yield();
+            await UniTask.WaitForSeconds(0.1f);
         }
     }
 
