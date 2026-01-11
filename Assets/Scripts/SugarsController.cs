@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -16,7 +17,7 @@ public class SugersController : MonoBehaviour
 
     private SugarFactory sugarFactory;
 
-    private ReactiveCollection<SugarUnit> sugarUnits;
+    private List<SugarUnit> sugarUnits;
 
     [SerializeField]
     private View view;
@@ -107,7 +108,7 @@ public class SugersController : MonoBehaviour
     {
         _cts = new CancellationTokenSource();
         sugarFactory = new SugarFactory();
-        sugarUnits = new ReactiveCollection<SugarUnit>();
+        sugarUnits = new List<SugarUnit>();
         ingameState = new ReactiveProperty<IngameState>();
         ingameState.Subscribe(state => UpdateState(state)).AddTo(this);
     }
@@ -179,7 +180,7 @@ public class SugersController : MonoBehaviour
 
     private void UpdateState(IngameState state)
     {
-        Debug.Log(state);
+        //Debug.Log(state);
         view.UpdateState(state);
         switch (state)
         {

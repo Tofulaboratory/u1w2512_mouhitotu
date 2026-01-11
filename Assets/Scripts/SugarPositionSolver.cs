@@ -5,7 +5,7 @@ public static class SugarPositionSolver
     private static Vector3 basePosition = new Vector3(-14f, -1.93f, 73.6f);
     private static float positionIntervalX = 1.174f;
     private static float positionIntervalY = 1f;
-    private static float beginPointPositionIdx = 20;
+    private static float beginPointPositionIdx = 16f;
 
     public static Vector3 GetSugarTargetPosition(SugarEntity entity)
     {
