@@ -47,7 +47,10 @@ public class View : MonoBehaviour
             case IngameState.FallSugar:
             break;
 
-            case IngameState.ChangeStateSugar:
+            case IngameState.SideMoveSugar:
+            break;
+
+            case IngameState.FastFallSugar:
             break;
 
             case IngameState.End:

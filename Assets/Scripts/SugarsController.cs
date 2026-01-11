@@ -124,8 +124,8 @@ public class SugersController : MonoBehaviour
 
                 case IngameState.FallSugar:
                     currentSugarUnit.DecidedPosition();
-                    ingameState.Value = IngameState.ChangeStateSugar;
                     _cts.Cancel();
+                    ingameState.Value = IngameState.FastFallSugar;
                     break;
 
                 case IngameState.Result:
@@ -150,8 +150,8 @@ public class SugersController : MonoBehaviour
                     diff,
                     new Vector2Int(targetX, GetLandablePositionIdx(targetX))
                 );
-                ingameState.Value = IngameState.ChangeStateSugar;
                 _cts.Cancel();
+                ingameState.Value = IngameState.SideMoveSugar;
             }
         }
 
@@ -171,8 +171,8 @@ public class SugersController : MonoBehaviour
                     diff,
                     new Vector2Int(targetX, GetLandablePositionIdx(targetX))
                 );
-                ingameState.Value = IngameState.ChangeStateSugar;
                 _cts.Cancel();
+                ingameState.Value = IngameState.SideMoveSugar;
             }
         }
     }
@@ -203,8 +203,7 @@ public class SugersController : MonoBehaviour
             case IngameState.FallSugar:
                 break;
 
-            case IngameState.ChangeStateSugar:
-                ingameState.Value = IngameState.FallSugar;
+            case IngameState.SideMoveSugar:
                 if (currentSugarUnit.Entity.IsMoving.Value)
                 {
                     MoveSugarUnitAsync(() =>
@@ -212,13 +211,14 @@ public class SugersController : MonoBehaviour
                         FreezeSugar();
                     }).Forget();
                 }
-                else
+                ingameState.Value = IngameState.FallSugar;
+                break;
+
+            case IngameState.FastFallSugar:
+                currentSugarUnit.FallFastAsync(() =>
                 {
-                    currentSugarUnit.FallFastAsync(() =>
-                    {
-                        FreezeSugar();
-                    }).Forget();
-                }
+                    FreezeSugar();
+                }).Forget();
                 break;
 
             case IngameState.End:

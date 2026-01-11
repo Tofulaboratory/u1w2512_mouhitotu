@@ -4,7 +4,8 @@ public enum IngameState
     Begin,
     CreateSugar,
     FallSugar,
-    ChangeStateSugar,
+    SideMoveSugar,
+    FastFallSugar,
     End,
     Result,
 }
