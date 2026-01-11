@@ -78,6 +78,8 @@ public class SugersController : MonoBehaviour
     {
         foreach (var unit in sugarUnits.OrderBy(item => item.Entity.positionIdx.Value.y))
         {
+            if (!unit.Entity.IsFreeze) continue;
+
             var target = sugarUnits
                 .Where(item => item.Entity.positionIdx.Value.x == unit.Entity.positionIdx.Value.x)
                 .Where(item => item.Entity.positionIdx.Value.y < unit.Entity.positionIdx.Value.y);
@@ -120,7 +122,7 @@ public class SugersController : MonoBehaviour
             switch (ingameState.Value)
             {
                 case IngameState.Title:
-                    ingameState.Value = IngameState.Begin;
+                    ingameState.Value = IngameState.PrepareBegin;
                     break;
 
                 case IngameState.FallSugar:
@@ -186,6 +188,15 @@ public class SugersController : MonoBehaviour
         {
             case IngameState.Title:
                 break;
+
+            case IngameState.PrepareBegin:
+                UniTask.Create(async () =>
+                {
+                    await UniTask.Delay(1000);
+                    ingameState.Value = IngameState.Begin;
+                }).Forget();
+                break;
+
             case IngameState.Begin:
                 ScoreManager.Instance.Initialize();
                 BuildFieldSugarUnit(ScoreManager.Instance.Level);
@@ -221,6 +232,21 @@ public class SugersController : MonoBehaviour
                 {
                     FreezeSugar();
                 }).Forget();
+                break;
+
+            case IngameState.PrepareToNextLevel:
+                UniTask.Create(async () =>
+                {
+                    await UniTask.Delay(1000);
+                    ingameState.Value = IngameState.ToNextLevel;
+                }).Forget();
+                ScoreManager.Instance.Level++;
+                RemoveAllSugarUnits();
+                BuildFieldSugarUnit(ScoreManager.Instance.Level);
+                break;
+
+            case IngameState.ToNextLevel:
+                ingameState.Value = IngameState.CreateSugar;
                 break;
 
             case IngameState.End:
@@ -265,6 +291,15 @@ public class SugersController : MonoBehaviour
         }).AddTo(unit);
     }
 
+    private void RemoveAllSugarUnits()
+    {
+        foreach (var item in sugarUnits)
+        {
+            Destroy(item.gameObject);
+        }
+        sugarUnits.Clear();
+    }
+
     private void BuildFieldSugarUnit(float height)
     {
         for (int i = 0; i < Const.FIELD_X_RANGE; i++)
@@ -280,7 +315,16 @@ public class SugersController : MonoBehaviour
     {
         CheckAndFireSugar(currentSugarUnit);
         currentSugarUnit.Entity.IsFreeze = true;
-        ingameState.Value = IngameState.CreateSugar;
+
+        //if (sugarUnits.Count <= Const.NEXT_LEVEL_THRESHOLD && !sugarUnits.Any(item => item.Entity.IsWaitCombo.Value))
+        if (sugarUnits.Count <= Const.NEXT_LEVEL_THRESHOLD)
+        {
+            ingameState.Value = IngameState.PrepareToNextLevel;
+        }
+        else
+        {
+            ingameState.Value = IngameState.CreateSugar;
+        }
     }
 
     private async UniTask MoveSugarUnitAsync(Action onComplete)

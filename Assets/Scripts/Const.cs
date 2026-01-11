@@ -8,4 +8,5 @@ public static class Const
     public const int FIELD_Y_RANGE = 12;
     public const float FALL_DURATION = 10f;
     public const float FALL_FAST_DURATION = 0.05f;
+    public const int NEXT_LEVEL_THRESHOLD = 5;
 }
