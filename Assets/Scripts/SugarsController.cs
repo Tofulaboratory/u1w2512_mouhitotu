@@ -186,7 +186,8 @@ public class SugersController : MonoBehaviour
             case IngameState.Title:
                 break;
             case IngameState.Begin:
-                BuildFieldSugarUnit();
+                ScoreManager.Instance.Initialize();
+                BuildFieldSugarUnit(ScoreManager.Instance.Level);
                 ingameState.Value = IngameState.CreateSugar;
                 break;
 
@@ -263,11 +264,11 @@ public class SugersController : MonoBehaviour
         }).AddTo(unit);
     }
 
-    private void BuildFieldSugarUnit()
+    private void BuildFieldSugarUnit(float height)
     {
         for (int i = 0; i < Const.FIELD_X_RANGE; i++)
         {
-            for (int j = 0; j < Const.FIELD_Y_RANGE - 1; j++)
+            for (int j = 0; j < height; j++)
             {
                 CreateSugarUnit(new Vector2Int(i, j), true);
             }
