@@ -159,6 +159,9 @@ public class View : MonoBehaviour
                 break;
 
             case IngameState.End:
+                timer.SetActive(false);
+                remainIndicator.SetActive(false);
+                levelUpAvailableText.SetActive(false);
                 break;
 
             case IngameState.Result:
