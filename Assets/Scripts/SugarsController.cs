@@ -115,6 +115,8 @@ public class SugersController : MonoBehaviour
 
     void Start()
     {
+        AudioManager.Instance.Initialize();
+        AudioManager.Instance.PlayBGM("bgm1", true, 0.5f);
         _cts = new CancellationTokenSource();
         sugarFactory = new SugarFactory();
         sugarUnits = new ReactiveCollection<SugarUnit>();
@@ -135,16 +137,19 @@ public class SugersController : MonoBehaviour
             {
                 case IngameState.Title:
                     ingameState.Value = IngameState.PrepareBegin;
+                    AudioManager.Instance.PlaySE("sys_01");
                     break;
 
                 case IngameState.FallSugar:
                     currentSugarUnit.DecidedPosition();
                     _cts.Cancel();
                     ingameState.Value = IngameState.FastFallSugar;
+                    AudioManager.Instance.PlaySE("sys_02");
                     break;
 
                 case IngameState.Result:
                     ingameState.Value = IngameState.Title;
+                    AudioManager.Instance.PlaySE("sys_01");
                     break;
             }
         }
@@ -170,6 +175,7 @@ public class SugersController : MonoBehaviour
                         );
                         _cts.Cancel();
                         ingameState.Value = IngameState.SideMoveSugar;
+                        AudioManager.Instance.PlaySE("sys_02");
                     }
                     break;
             }
@@ -196,6 +202,7 @@ public class SugersController : MonoBehaviour
                         );
                         _cts.Cancel();
                         ingameState.Value = IngameState.SideMoveSugar;
+                        AudioManager.Instance.PlaySE("sys_02");
                     }
                     break;
             }
@@ -211,6 +218,7 @@ public class SugersController : MonoBehaviour
                 break;
 
             case IngameState.PrepareBegin:
+                AudioManager.Instance.PlaySE("success");
                 ScoreManager.Instance.Initialize();
                 view.InitializeForScoreManager();
                 UniTask.Create(async () =>
@@ -259,6 +267,7 @@ public class SugersController : MonoBehaviour
                 break;
 
             case IngameState.PrepareToNextLevel:
+                AudioManager.Instance.PlaySE("success");
                 UniTask.Create(async () =>
                 {
                     await UniTask.Delay(1000);
@@ -276,6 +285,7 @@ public class SugersController : MonoBehaviour
 
             case IngameState.End:
                 UniTask.Create(async () => {
+                    AudioManager.Instance.PlaySE("explode");
                     RemoveAllSugarUnits();
                     RemoveAllGhostSugarUnits();
                     await UniTask.Delay(1000);
@@ -284,6 +294,7 @@ public class SugersController : MonoBehaviour
                 break;
 
             case IngameState.Result:
+                AudioManager.Instance.PlaySE("gameover");
                 ScoreManager.Instance.ResetTimer();
                 break;
         }
@@ -326,6 +337,7 @@ public class SugersController : MonoBehaviour
                 ScoreManager.Instance.AddGameTime.Value += Const.TIME_DURATION_BLOCK_BONUS;
                 unit.ExplodeAsync(() =>
                 {
+                    AudioManager.Instance.PlaySE("explode",0.5f);
                     sugarUnits.Remove(unit);
                     Destroy(unit.gameObject);
                     BreakDownSugars();
@@ -379,6 +391,7 @@ public class SugersController : MonoBehaviour
         //if (sugarUnits.Count <= Const.NEXT_LEVEL_THRESHOLD && !sugarUnits.Any(item => item.Entity.IsWaitCombo.Value))
         if (ingameState.Value < IngameState.End)
         {
+            AudioManager.Instance.PlaySE("cube_fall");
             if (sugarUnits.Count <= Const.NEXT_LEVEL_THRESHOLD)
             {
                 ingameState.Value = IngameState.PrepareToNextLevel;

@@ -44,6 +44,15 @@ public class ScoreManager : SingletonMonoBehaviour<ScoreManager>
         {
             await UniTask.Delay(1000);
             GameTime.Value--;
+
+            if(GameTime.Value == 10)
+            {
+                AudioManager.Instance.PlaySE("sys_04");
+            }
+            if(GameTime.Value <= 3)
+            {
+                AudioManager.Instance.PlaySE("sys_03");
+            }
             if(GameTime.Value <= 0)
             {
                 onEnd?.Invoke();
