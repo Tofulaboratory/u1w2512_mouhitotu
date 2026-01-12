@@ -32,4 +32,9 @@ public class SugarEntity
     {
         return Vector2Int.Distance(this.positionIdx.Value, positionIdx) <= 1;
     }
+
+    public bool IsSafe()
+    {
+        return positionIdx.Value.y < Const.FIELD_Y_RANGE;
+    }
 }

@@ -628,7 +628,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Level1
+  m_text: "\u6B8B\u308A10/5"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: aeb4ada265fb54410bbb9b14915f4644, type: 2}
   m_sharedMaterial: {fileID: -8247301246610020883, guid: aeb4ada265fb54410bbb9b14915f4644, type: 2}
@@ -655,8 +655,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36.4
-  m_fontSizeBase: 36.4
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1958,7 +1958,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1107220052}
   m_Layer: 5
-  m_Name: LevelIndicator
+  m_Name: RemainIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2834,8 +2834,8 @@ MonoBehaviour:
   title: {fileID: 11895574}
   timer: {fileID: 936286194}
   timerText: {fileID: 837159763}
-  levelIndicator: {fileID: 1107220051}
-  levelIndicatorText: {fileID: 190190191}
+  remainIndicator: {fileID: 1107220051}
+  remainIndicatorText: {fileID: 190190191}
   pressSpace: {fileID: 1831610176}
   result: {fileID: 404396366}
   resultLevelText: {fileID: 1881145915}

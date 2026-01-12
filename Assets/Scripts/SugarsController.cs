@@ -53,6 +53,12 @@ public class SugersController : MonoBehaviour
 
     private void CheckAndFireSugar(SugarUnit unit)
     {
+        if(!unit.Entity.IsSafe())
+        {
+            ingameState.Value = IngameState.End;
+            return;
+        }
+
         for (int i = sugarUnits.Count() - 1; i >= 0; i--)
         {
             var item = sugarUnits[i];
@@ -112,7 +118,10 @@ public class SugersController : MonoBehaviour
         _cts = new CancellationTokenSource();
         sugarFactory = new SugarFactory();
         sugarUnits = new ReactiveCollection<SugarUnit>();
-        sugarUnits.ObserveCountChanged().Subscribe(_ => view.SetActivelevelUpAvailableText(sugarUnits.Count <= Const.NEXT_LEVEL_THRESHOLD)).AddTo(this);
+        sugarUnits.ObserveCountChanged().Subscribe(cnt =>{
+            view.SetRemainSugarCount(cnt);
+            view.SetActivelevelUpAvailableText(cnt <= Const.NEXT_LEVEL_THRESHOLD);
+        }).AddTo(this);
         ingameState = new ReactiveProperty<IngameState>();
         ingameState.Subscribe(state => UpdateState(state)).AddTo(this);
         ghostSugarUnits = new List<SugarUnit>();
@@ -344,7 +353,7 @@ public class SugersController : MonoBehaviour
     {
         for (int i = 0; i < Const.FIELD_X_RANGE; i++)
         {
-            for (int j = 0; j < height; j++)
+            for (int j = 0; j < height && j < Const.FIELD_Y_RANGE - 2; j++)
             {
                 CreateSugarUnit(new Vector2Int(i, j), true);
             }

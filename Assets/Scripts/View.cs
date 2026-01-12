@@ -21,10 +21,10 @@ public class View : MonoBehaviour
     private TextMeshProUGUI timerText;
 
     [SerializeField]
-    private GameObject levelIndicator;
+    private GameObject remainIndicator;
 
     [SerializeField]
-    private TextMeshProUGUI levelIndicatorText;
+    private TextMeshProUGUI remainIndicatorText;
 
     [SerializeField]
     private GameObject pressSpace;
@@ -89,7 +89,6 @@ public class View : MonoBehaviour
 
     public void SetLevelText()
     {
-        levelIndicatorText.text = $"LEVEL {ScoreManager.Instance.Level}";
         levelCenterText.text = $"LEVEL {ScoreManager.Instance.Level}";
         resultLevelText.text = $"LEVEL {ScoreManager.Instance.Level}";
     }
@@ -98,6 +97,8 @@ public class View : MonoBehaviour
     {
         levelUpAvailableText.SetActive(isActive);
     }
+
+    public void SetRemainSugarCount(int count) => remainIndicatorText.text = $"残り{count}/5";
 
     public void UpdateState(IngameState state)
     {
@@ -108,7 +109,7 @@ public class View : MonoBehaviour
                 nigiyaka2.SetActive(false);
                 title.SetActive(true);
                 timer.SetActive(false);
-                levelIndicator.SetActive(false);
+                remainIndicator.SetActive(false);
                 pressSpace.SetActive(true);
                 result.SetActive(false);
                 levelCenter.SetActive(false);
@@ -119,7 +120,7 @@ public class View : MonoBehaviour
                 nigiyaka1.SetActive(false);
                 title.SetActive(false);
                 timer.SetActive(true);
-                levelIndicator.SetActive(true);
+                remainIndicator.SetActive(true);
                 pressSpace.SetActive(false);
 
                 nigiyaka2.SetActive(true);
