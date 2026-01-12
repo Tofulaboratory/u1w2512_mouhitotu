@@ -33,9 +33,6 @@ public class View : MonoBehaviour
     private GameObject result;
 
     [SerializeField]
-    private TextMeshProUGUI resultScoreText;
-
-    [SerializeField]
     private TextMeshProUGUI resultLevelText;
 
     [SerializeField]
@@ -47,9 +44,47 @@ public class View : MonoBehaviour
     [SerializeField]
     private GameObject levelUpAvailableText;
 
+    [SerializeField]
+    private GameObject addTimeTextGameObject;
+
+    [SerializeField]
+    private TextMeshProUGUI addTimeText;
+
+    private CompositeDisposable disposable = new CompositeDisposable();
+
+    private int addTimeCount = 0;
+
+    public void DisplayAddTimeText(float time) => DisplayAddTimeTextAsync(time).Forget();
+    private async UniTask DisplayAddTimeTextAsync(float time)
+    {
+        if (time < 1) return;
+        var t = (int)time;
+        addTimeCount++;
+
+        addTimeTextGameObject.SetActive(true);
+        addTimeText.text = $"+{t}";
+        var prevFontSize = 35f;
+        addTimeText.fontSize = prevFontSize * 1.5f;
+        await UniTask.Delay(100);
+        addTimeText.fontSize = prevFontSize;
+        await UniTask.Delay(900);
+        addTimeCount--;
+        if (addTimeCount <= 0)
+        {
+            addTimeTextGameObject.SetActive(false);
+        }
+    }
+
     public void InitializeForScoreManager()
     {
-        ScoreManager.Instance.GameTime.Subscribe(time => timerText.text = $"{time}").AddTo(this).AddTo(this);
+        disposable.Clear();
+        ScoreManager.Instance.GameTime.Subscribe(time =>
+        {
+            timerText.text = $"{time}";
+        }).AddTo(disposable);
+        ScoreManager.Instance.AddGameTime.Subscribe(time => {
+            DisplayAddTimeText(time);
+        }).AddTo(disposable);
     }
 
     public void SetLevelText()
@@ -66,71 +101,71 @@ public class View : MonoBehaviour
 
     public void UpdateState(IngameState state)
     {
-        switch(state)
+        switch (state)
         {
             case IngameState.Title:
-            nigiyaka1.SetActive(true);
-            nigiyaka2.SetActive(false);
-            title.SetActive(true);
-            timer.SetActive(false);
-            levelIndicator.SetActive(false);
-            pressSpace.SetActive(true);
-            result.SetActive(false);
-            levelCenter.SetActive(false);
-            levelUpAvailableText.SetActive(false);
-            break;
+                nigiyaka1.SetActive(true);
+                nigiyaka2.SetActive(false);
+                title.SetActive(true);
+                timer.SetActive(false);
+                levelIndicator.SetActive(false);
+                pressSpace.SetActive(true);
+                result.SetActive(false);
+                levelCenter.SetActive(false);
+                levelUpAvailableText.SetActive(false);
+                break;
 
             case IngameState.PrepareBegin:
-            nigiyaka1.SetActive(false);
-            title.SetActive(false);
-            timer.SetActive(true);
-            levelIndicator.SetActive(true);
-            pressSpace.SetActive(false);
+                nigiyaka1.SetActive(false);
+                title.SetActive(false);
+                timer.SetActive(true);
+                levelIndicator.SetActive(true);
+                pressSpace.SetActive(false);
 
-            nigiyaka2.SetActive(true);
-            nigiyaka2.GetComponent<Animator>().SetTrigger("NigiyakaMove1");
-            levelCenter.SetActive(true);
-            SetLevelText();
-            break;
+                nigiyaka2.SetActive(true);
+                nigiyaka2.GetComponent<Animator>().SetTrigger("NigiyakaMove1");
+                levelCenter.SetActive(true);
+                SetLevelText();
+                break;
 
             case IngameState.Begin:
-            nigiyaka2.SetActive(false);          
-            levelCenter.SetActive(false);
-            break;
+                nigiyaka2.SetActive(false);
+                levelCenter.SetActive(false);
+                break;
 
             case IngameState.CreateSugar:
-            break;
+                break;
 
             case IngameState.FallSugar:
-            break;
+                break;
 
             case IngameState.SideMoveSugar:
-            break;
+                break;
 
             case IngameState.FastFallSugar:
-            break;
+                break;
 
             case IngameState.PrepareToNextLevel:
-            nigiyaka2.SetActive(true);
-            nigiyaka2.GetComponent<Animator>().SetTrigger("NigiyakaMove1");
-            levelCenter.SetActive(true);
-            SetLevelText();
-            break;
+                nigiyaka2.SetActive(true);
+                nigiyaka2.GetComponent<Animator>().SetTrigger("NigiyakaMove1");
+                levelCenter.SetActive(true);
+                SetLevelText();
+                break;
 
             case IngameState.ToNextLevel:
-            nigiyaka2.SetActive(false);            
-            levelCenter.SetActive(false);
-            break;
+                nigiyaka2.SetActive(false);
+                levelCenter.SetActive(false);
+                break;
 
             case IngameState.End:
-            break;
+                break;
 
             case IngameState.Result:
-            result.SetActive(true);
-            break;
+                result.SetActive(true);
+                break;
 
             default:
-            break;
+                break;
         }
     }
 }

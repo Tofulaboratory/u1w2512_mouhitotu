@@ -253,7 +253,7 @@ public class SugersController : MonoBehaviour
                     ingameState.Value = IngameState.ToNextLevel;
                 }).Forget();
                 ScoreManager.Instance.Level++;
-                ScoreManager.Instance.ResetTimer();
+                ScoreManager.Instance.AddGameTime.Value = Const.TIME_DURATION_LEVEL_UP;
                 RemoveAllSugarUnits();
                 BuildFieldSugarUnit(ScoreManager.Instance.Level);
                 break;
@@ -299,6 +299,7 @@ public class SugersController : MonoBehaviour
         {
             if (value)
             {
+                ScoreManager.Instance.AddGameTime.Value += Const.TIME_DURATION_BLOCK_BONUS;
                 unit.ExplodeAsync(() =>
                 {
                     sugarUnits.Remove(unit);
