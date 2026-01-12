@@ -275,9 +275,12 @@ public class SugersController : MonoBehaviour
                 break;
 
             case IngameState.End:
-                RemoveAllSugarUnits();
-                RemoveAllGhostSugarUnits();
-                ingameState.Value = IngameState.Result;
+                UniTask.Create(async () => {
+                    RemoveAllSugarUnits();
+                    RemoveAllGhostSugarUnits();
+                    await UniTask.Delay(1000);
+                    ingameState.Value = IngameState.Result;
+                });
                 break;
 
             case IngameState.Result:

@@ -50,6 +50,9 @@ public class View : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI addTimeText;
 
+    [SerializeField]
+    private GameObject gameOverGameObjects;
+
     private CompositeDisposable disposable = new CompositeDisposable();
 
     private int addTimeCount = 0;
@@ -162,9 +165,11 @@ public class View : MonoBehaviour
                 timer.SetActive(false);
                 remainIndicator.SetActive(false);
                 levelUpAvailableText.SetActive(false);
+                gameOverGameObjects.SetActive(true);
                 break;
 
             case IngameState.Result:
+                gameOverGameObjects.SetActive(false);
                 result.SetActive(true);
                 break;
 
