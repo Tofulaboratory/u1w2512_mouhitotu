@@ -7,9 +7,6 @@ using UnityEngine;
 public class ScoreManager : SingletonMonoBehaviour<ScoreManager>
 {
     [NonSerialized]
-    public int Score;
-
-    [NonSerialized]
     public int Level;
 
     [NonSerialized]
@@ -24,7 +21,6 @@ public class ScoreManager : SingletonMonoBehaviour<ScoreManager>
     {
         disposable.Clear();
 
-        Score = 0;
         Level = 1;
         GameTime = new ReactiveProperty<int>(Const.TIME_DURATION_LEVEL);
         AddGameTime = new ReactiveProperty<float>();

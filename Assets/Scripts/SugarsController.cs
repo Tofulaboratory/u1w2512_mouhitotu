@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using unityroom.Api;
 
 /// <summary>
 /// TODO 合間を見て整理
@@ -116,7 +117,7 @@ public class SugersController : MonoBehaviour
     void Start()
     {
         AudioManager.Instance.Initialize();
-        AudioManager.Instance.PlayBGM("bgm1", true, 0.5f);
+        AudioManager.Instance.PlayBGM("bgm1", true, 0.3f);
         _cts = new CancellationTokenSource();
         sugarFactory = new SugarFactory();
         sugarUnits = new ReactiveCollection<SugarUnit>();
@@ -295,6 +296,7 @@ public class SugersController : MonoBehaviour
 
             case IngameState.Result:
                 AudioManager.Instance.PlaySE("gameover");
+                UnityroomApiClient.Instance.SendScore(1, ScoreManager.Instance.Level, ScoreboardWriteMode.Always);
                 ScoreManager.Instance.ResetTimer();
                 break;
         }
@@ -337,7 +339,7 @@ public class SugersController : MonoBehaviour
                 ScoreManager.Instance.AddGameTime.Value += Const.TIME_DURATION_BLOCK_BONUS;
                 unit.ExplodeAsync(() =>
                 {
-                    AudioManager.Instance.PlaySE("explode",0.5f);
+                    AudioManager.Instance.PlaySE("explode",0.3f);
                     sugarUnits.Remove(unit);
                     Destroy(unit.gameObject);
                     BreakDownSugars();
