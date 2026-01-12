@@ -18,6 +18,7 @@ public class SugersController : MonoBehaviour
     private SugarFactory sugarFactory;
 
     private ReactiveCollection<SugarUnit> sugarUnits;
+    private List<SugarUnit> ghostSugarUnits;
 
     [SerializeField]
     private View view;
@@ -114,6 +115,7 @@ public class SugersController : MonoBehaviour
         sugarUnits.ObserveCountChanged().Subscribe(_ => view.SetActivelevelUpAvailableText(sugarUnits.Count <= Const.NEXT_LEVEL_THRESHOLD)).AddTo(this);
         ingameState = new ReactiveProperty<IngameState>();
         ingameState.Subscribe(state => UpdateState(state)).AddTo(this);
+        ghostSugarUnits = new List<SugarUnit>();
     }
 
     void Update()
@@ -211,6 +213,7 @@ public class SugersController : MonoBehaviour
 
             case IngameState.Begin:
                 BuildFieldSugarUnit(ScoreManager.Instance.Level);
+                BuildFieldGhostSugarUnit();
                 ScoreManager.Instance.BeginTimer(() => ingameState.Value = IngameState.End).Forget();
                 ingameState.Value = IngameState.CreateSugar;
                 break;
@@ -264,6 +267,7 @@ public class SugersController : MonoBehaviour
 
             case IngameState.End:
                 RemoveAllSugarUnits();
+                RemoveAllGhostSugarUnits();
                 ingameState.Value = IngameState.Result;
                 break;
 
@@ -275,13 +279,21 @@ public class SugersController : MonoBehaviour
         view.UpdateState(state);
     }
 
-    private void CreateSugarUnit(Vector2Int positionIdx, bool isPreInit)
+    private void CreateSugarUnit(Vector2Int positionIdx, bool isPreInit, bool isGhost = false)
     {
-        var entity = sugarFactory.CreateSuger(positionIdx, isPreInit);
+        var entity = sugarFactory.CreateSuger(positionIdx, isPreInit, isGhost);
         var unit = Instantiate(sugerUnitPrefab, transform.position, Quaternion.identity);
-        sugarUnits.Add(unit);
 
-        if (isPreInit)
+        if(isGhost)
+        {
+            ghostSugarUnits.Add(unit);
+        }
+        else
+        {
+            sugarUnits.Add(unit);
+        }
+
+        if (isPreInit || isGhost)
         {
             unit.Initialize(entity);
             unit.FallImmedatelyAsync(() =>
@@ -319,6 +331,15 @@ public class SugersController : MonoBehaviour
         sugarUnits.Clear();
     }
 
+    private void RemoveAllGhostSugarUnits()
+    {
+        foreach (var item in ghostSugarUnits)
+        {
+            Destroy(item.gameObject);
+        }
+        ghostSugarUnits.Clear();
+    }
+
     private void BuildFieldSugarUnit(float height)
     {
         for (int i = 0; i < Const.FIELD_X_RANGE; i++)
@@ -327,6 +348,14 @@ public class SugersController : MonoBehaviour
             {
                 CreateSugarUnit(new Vector2Int(i, j), true);
             }
+        }
+    }
+
+    private void BuildFieldGhostSugarUnit()
+    {
+        for (int i = 0; i < Const.FIELD_X_RANGE; i++)
+        {
+            CreateSugarUnit(new Vector2Int(i, Const.FIELD_Y_RANGE), true, true);
         }
     }
 

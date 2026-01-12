@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UniRx;
 using UnityEngine;
 
@@ -13,7 +14,9 @@ public class SugarEntity
     public int ChainId = -1;
     public bool IsPreInit { get; private set; }
 
-    public SugarEntity(bool isPreInit)
+    public bool IsGhost { get; private set; }
+
+    public SugarEntity(bool isPreInit, bool isGhost)
     {
         state = new ReactiveProperty<SugarState>();
         IsMoving = new ReactiveProperty<bool>(true);
@@ -22,6 +25,7 @@ public class SugarEntity
         positionIdx = new ReactiveProperty<Vector2Int>();
         WaitComboGaugeNum = new ReactiveProperty<float>(Const.SUGAR_GAUGE_DURATION);
         IsPreInit = isPreInit;
+        IsGhost = isGhost;
     }
 
     public bool IsNeighbor(Vector2Int positionIdx)

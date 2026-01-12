@@ -54,9 +54,13 @@ public class SugarUnit : MonoBehaviour
         this.entity = entity;
 
         model.SetActive(false);
-        SetMaterial();
+        SetVisibleGhost(entity.IsGhost);
+        if(!entity.IsGhost)
+        {
+            SetMaterial();
+        }
         MoveToBeginPosition(ct);
-        model.SetActive(true);
+        model.SetActive(!entity.IsGhost);
 
         Entity.IsWaitCombo.Subscribe(value =>
         {
