@@ -339,7 +339,7 @@ public class SugersController : MonoBehaviour
                 ScoreManager.Instance.AddGameTime.Value += Const.TIME_DURATION_BLOCK_BONUS;
                 unit.ExplodeAsync(() =>
                 {
-                    AudioManager.Instance.PlaySE("explode",0.3f);
+                    AudioManager.Instance.PlaySE("explode",0.2f);
                     sugarUnits.Remove(unit);
                     Destroy(unit.gameObject);
                     BreakDownSugars();
