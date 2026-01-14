@@ -390,7 +390,6 @@ public class SugersController : MonoBehaviour
         CheckAndFireSugar(currentSugarUnit);
         currentSugarUnit.Entity.IsFreeze = true;
 
-        //if (sugarUnits.Count <= Const.NEXT_LEVEL_THRESHOLD && !sugarUnits.Any(item => item.Entity.IsWaitCombo.Value))
         if (ingameState.Value < IngameState.End)
         {
             AudioManager.Instance.PlaySE("cube_fall");
